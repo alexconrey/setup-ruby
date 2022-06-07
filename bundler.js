@@ -120,7 +120,7 @@ export async function installBundler(bundlerVersionInput, rubygemsInputSet, lock
   return bundlerVersion
 }
 
-export async function bundleInstall(gemfile, lockFile, platform, engine, rubyVersion, bundlerVersion, cacheVersion) {
+export async function bundleInstall(gemfile, lockFile, deployment, platform, engine, rubyVersion, bundlerVersion, cacheVersion) {
   if (gemfile === null) {
     console.log('Could not determine gemfile path, skipping "bundle install" and caching')
     return false
@@ -134,6 +134,9 @@ export async function bundleInstall(gemfile, lockFile, platform, engine, rubyVer
     envOptions = { env: { ...process.env, BUNDLER_VERSION: bundlerVersion } }
   }
 
+  await exec.exec('env')
+  console.log(`${envOptions}`)
+
   // config
   const cachePath = 'vendor/bundle'
   // An absolute path, so it is reliably under $PWD/vendor/bundle, and not relative to the gemfile's directory
@@ -141,7 +144,7 @@ export async function bundleInstall(gemfile, lockFile, platform, engine, rubyVer
 
   await exec.exec('bundle', ['config', '--local', 'path', bundleCachePath], envOptions)
 
-  if (fs.existsSync(lockFile)) {
+  if ((fs.existsSync(lockFile)) && (deployment)) {
     await exec.exec('bundle', ['config', '--local', 'deployment', 'true'], envOptions)
   } else {
     // Generate the lockfile so we can use it to compute the cache key.
