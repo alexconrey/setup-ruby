@@ -135,7 +135,7 @@ export async function bundleInstall(gemfile, lockFile, deployment, platform, eng
   }
 
   await exec.exec('env')
-  console.log(`${envOptions}`)
+  console.log(`Environment Options: ${envOptions}`)
 
   // config
   const cachePath = 'vendor/bundle'
