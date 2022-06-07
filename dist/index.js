@@ -134,7 +134,7 @@ async function installBundler(bundlerVersionInput, rubygemsInputSet, lockFile, p
   return bundlerVersion
 }
 
-async function bundleInstall(gemfile, lockFile, platform, engine, rubyVersion, bundlerVersion, cacheVersion) {
+async function bundleInstall(gemfile, lockFile, deployment, platform, engine, rubyVersion, bundlerVersion, cacheVersion) {
   if (gemfile === null) {
     console.log('Could not determine gemfile path, skipping "bundle install" and caching')
     return false
@@ -156,7 +156,7 @@ async function bundleInstall(gemfile, lockFile, platform, engine, rubyVersion, b
   await exec.exec('bundle', ['config', '--local', 'path', bundleCachePath], envOptions)
 
   if (fs.existsSync(lockFile)) {
-    await exec.exec('bundle', ['config', '--local', 'deployment', 'true'], envOptions)
+    await exec.exec('bundle', ['config', '--local', 'deployment', deployment], envOptions)
   } else {
     // Generate the lockfile so we can use it to compute the cache key.
     // This will also automatically pick up the latest gem versions compatible with the Gemfile.
@@ -65626,6 +65626,7 @@ const inputDefaults = {
   'rubygems': 'default',
   'bundler': 'default',
   'bundler-cache': 'false',
+  'bundler-deployment': 'true',
   'working-directory': '.',
   'cache-version': bundler.DEFAULT_CACHE_VERSION,
 }
@@ -65701,7 +65702,7 @@ async function setupRuby(options = {}) {
 
   if (inputs['bundler-cache'] === 'true') {
     await common.measure('bundle install', async () =>
-      bundler.bundleInstall(gemfile, lockFile, platform, engine, version, bundlerVersion, inputs['cache-version']))
+      bundler.bundleInstall(gemfile, lockFile, inputs['deployment'], platform, engine, version, bundlerVersion, inputs['cache-version']))
   }
 
   core.setOutput('ruby-prefix', rubyPrefix)

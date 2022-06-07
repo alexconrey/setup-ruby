@@ -134,9 +134,6 @@ export async function bundleInstall(gemfile, lockFile, deployment, platform, eng
     envOptions = { env: { ...process.env, BUNDLER_VERSION: bundlerVersion } }
   }
 
-  await exec.exec('env')
-  console.log(`Environment Options: ${envOptions}`)
-
   // config
   const cachePath = 'vendor/bundle'
   // An absolute path, so it is reliably under $PWD/vendor/bundle, and not relative to the gemfile's directory
@@ -144,13 +141,13 @@ export async function bundleInstall(gemfile, lockFile, deployment, platform, eng
 
   await exec.exec('bundle', ['config', '--local', 'path', bundleCachePath], envOptions)
 
-  // if ((fs.existsSync(lockFile)) && (deployment)) {
-  //   await exec.exec('bundle', ['config', '--local', 'deployment', 'true'], envOptions)
-  // } else {
-  //   // Generate the lockfile so we can use it to compute the cache key.
-  //   // This will also automatically pick up the latest gem versions compatible with the Gemfile.
-  //   await exec.exec('bundle', ['lock'], envOptions)
-  // }
+  if (fs.existsSync(lockFile)) {
+    await exec.exec('bundle', ['config', '--local', 'deployment', deployment], envOptions)
+  } else {
+    // Generate the lockfile so we can use it to compute the cache key.
+    // This will also automatically pick up the latest gem versions compatible with the Gemfile.
+    await exec.exec('bundle', ['lock'], envOptions)
+  }
 
   await afterLockFile(lockFile, platform, engine, rubyVersion)
 
