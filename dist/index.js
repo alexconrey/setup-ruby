@@ -65702,7 +65702,7 @@ async function setupRuby(options = {}) {
 
   if (inputs['bundler-cache'] === 'true') {
     await common.measure('bundle install', async () =>
-      bundler.bundleInstall(gemfile, lockFile, inputs['deployment'], platform, engine, version, bundlerVersion, inputs['cache-version']))
+      bundler.bundleInstall(gemfile, lockFile, inputs['bundler-deployment'], platform, engine, version, bundlerVersion, inputs['cache-version']))
   }
 
   core.setOutput('ruby-prefix', rubyPrefix)
